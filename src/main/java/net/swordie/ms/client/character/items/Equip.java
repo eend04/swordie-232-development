@@ -1773,8 +1773,8 @@ public class Equip extends Item {
         var info = getInfo();
 
         long exGradeOption = 0;
-        int minTier = info.isBossReward() || obtained ? 4 : 4;
-        int maxTier = info.isBossReward() || obtained ? 7 : 7;
+int minTier = obtained ? 5 : 4;
+int maxTier = 7;
         int bonusStats = info.isBossReward() ? 4 : Util.getRandom(4, 4);
         int statsApplied = 0;
         boolean[] flameApplied = new boolean[FlameStat.values().length];

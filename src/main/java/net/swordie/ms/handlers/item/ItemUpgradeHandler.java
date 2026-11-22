@@ -78,8 +78,9 @@ public class ItemUpgradeHandler {
             boolean success = Util.succeedProp(vals.getOrDefault(ScrollStat.success, 100));
 
             if (success) {
-                boolean eternalFlame = vals.getOrDefault(ScrollStat.createType, 6) >= 7;
-                equip.randomizeFlameStats(eternalFlame); // Generate high stats if it's an eternal/RED flame only.
+                boolean eternalFlame =
+    flame.getItemId() == ItemConstants.ETERNAL_REBIRTH_FLAME;
+equip.randomizeFlameStats(eternalFlame);
 
                 updateZeroEgoEquipComplete(chr, equip, ePos, true);
             }
