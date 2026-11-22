@@ -2279,12 +2279,21 @@ public class AdminCommands {
     public static class Shop extends AdminCommand {
 
         public static void execute(Char chr, String[] args) {
-            int shopId = 1011100;
-            if (args.length > 1) {
-                shopId = Integer.parseInt(args[1]);
-            }
-            chr.getScriptManager().openShop(shopId);
+    int shopId = 1011100;
+
+    // Search backwards for the last numeric argument.
+    // This also handles an unexpectedly duplicated command token.
+    for (int i = args.length - 1; i >= 1; i--) {
+        try {
+            shopId = Integer.parseInt(args[i].trim());
+            break;
+        } catch (NumberFormatException ignored) {
+            // Not a numeric argument; check the preceding token.
         }
+    }
+
+    chr.getScriptManager().openShop(shopId);
+}
     }
 
     // lie detector
