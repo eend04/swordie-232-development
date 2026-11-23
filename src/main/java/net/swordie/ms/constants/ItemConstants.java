@@ -837,16 +837,7 @@ public class ItemConstants {
                 Util.makeSet(EXCEPTIONAL_EX_ALLOWED).contains(equip.getItemId()) ||
                 isGlove(equip.getItemId()) ||
                 isCape(equip.getItemId()) ||
-                isPocketItem(equip.getItemId()) ||
-				isRing(equip.getItemId()) ||
-				isTotem(equip.getItemId()) ||
-				isMechanicalHeart(equip.getItemId()) ||
-				isBadge(equip.getItemId()) ||
-				isMedal(equip.getItemId()) ||
-				isShoulder(equip.getItemId()) ||
-				isSecondary(equip.getItemId()) ||
-				isAndroid(equip.getItemId()) ||
-				isEmblem(equip.getItemId()));
+                isPocketItem(equip.getItemId()));
     }
 
     public static boolean canEquipGoldHammer(Equip equip) {

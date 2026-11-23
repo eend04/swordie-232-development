@@ -938,6 +938,144 @@ public static class SpawnFamiliar extends AdminCommand {
         }
     }
 
+
+    @Command(names = {"addstat", "additemstat"}, requiredType = Tester)
+    public static class AddItemStat extends AdminCommand {
+
+        public static void execute(Char chr, String[] args) {
+            if (args.length < 4) {
+                chr.chatMessage("Usage: !addstat <inventory slot> <stat> <amount>");
+                chr.chatMessage("Example: !addstat 1 STR 100");
+                return;
+            }
+
+            int invPosition;
+            int amount;
+
+            try {
+                invPosition = Integer.parseInt(args[1]);
+                amount = Integer.parseInt(args[3]);
+            } catch (NumberFormatException e) {
+                chr.chatMessage("Slot and amount must be valid numbers.");
+                return;
+            }
+
+            Item item = chr.getEquipInventory().getItemBySlot(invPosition);
+
+            if (!(item instanceof Equip)) {
+                chr.chatMessage("There is no equipment in inventory slot " + invPosition + ".");
+                return;
+            }
+
+            Equip equip = (Equip) item;
+            String stat = args[2].toUpperCase();
+
+            try {
+                switch (stat) {
+                    case "STR":
+                        equip.setiStr(addShort(equip.getiStr(), amount));
+                        break;
+                    case "DEX":
+                        equip.setiDex(addShort(equip.getiDex(), amount));
+                        break;
+                    case "INT":
+                        equip.setiInt(addShort(equip.getiInt(), amount));
+                        break;
+                    case "LUK":
+                        equip.setiLuk(addShort(equip.getiLuk(), amount));
+                        break;
+                    case "HP":
+                    case "MHP":
+                        equip.setiMaxHp(addInt(equip.getiMaxHp(), amount));
+                        break;
+                    case "MP":
+                    case "MMP":
+                        equip.setiMaxMp(addShort(equip.getiMaxMp(), amount));
+                        break;
+                    case "PAD":
+                    case "ATT":
+                    case "ATK":
+                        equip.setiPad(addShort(equip.getiPad(), amount));
+                        break;
+                    case "MAD":
+                    case "MATT":
+                    case "MATK":
+                        equip.setiMad(addShort(equip.getiMad(), amount));
+                        break;
+                    case "PDD":
+                        equip.setiPDD(addShort(equip.getiPDD(), amount));
+                        break;
+                    case "MDD":
+                        equip.setiMDD(addShort(equip.getiMDD(), amount));
+                        break;
+                    case "ACC":
+                        equip.setiAcc(addShort(equip.getiAcc(), amount));
+                        break;
+                    case "EVA":
+                        equip.setiEva(addShort(equip.getiEva(), amount));
+                        break;
+                    case "SPEED":
+                        equip.setiSpeed(addShort(equip.getiSpeed(), amount));
+                        break;
+                    case "JUMP":
+                        equip.setiJump(addShort(equip.getiJump(), amount));
+                        break;
+                    case "ALLSTAT":
+                    case "AS":
+                        equip.setStatR(addShort(equip.getStatR(), amount));
+                        break;
+                    case "BOSS":
+                    case "BD":
+                        equip.setBdr(addShort(equip.getBdr(), amount));
+                        break;
+                    case "IED":
+                        equip.setImdr(addShort(equip.getImdr(), amount));
+                        break;
+                    case "DAMAGE":
+                    case "DMG":
+                        equip.setDamR(addShort(equip.getDamR(), amount));
+                        break;
+                    default:
+                        chr.chatMessage("Unknown stat: " + stat);
+                        chr.chatMessage("Available: STR DEX INT LUK HP MP PAD MAD PDD MDD ACC EVA SPEED JUMP ALLSTAT BOSS IED DAMAGE");
+                        return;
+                }
+            } catch (IllegalArgumentException e) {
+                chr.chatMessage("Stat value would exceed the supported range.");
+                return;
+            }
+
+            // Send the modified existing item to the client.
+            equip.updateToChar(chr);
+
+            chr.chatMessage(String.format(
+                    "Added %d %s to item %d in inventory slot %d.",
+                    amount, stat, equip.getItemId(), invPosition
+            ));
+        }
+
+        private static short addShort(short current, int amount) {
+            long result = (long) current + amount;
+
+            if (result < Short.MIN_VALUE || result > Short.MAX_VALUE) {
+                throw new IllegalArgumentException("Short overflow");
+            }
+
+            return (short) result;
+        }
+
+        private static int addInt(int current, int amount) {
+            long result = (long) current + amount;
+
+            if (result < Integer.MIN_VALUE || result > Integer.MAX_VALUE) {
+                throw new IllegalArgumentException("Integer overflow");
+            }
+
+            return (int) result;
+        }
+    }
+
+
     @Command(names = {"setbonuspotential", "setbpotential", "setbpot"}, requiredType = Tester)
     public static class SetBonusPotential extends AdminCommand {
 

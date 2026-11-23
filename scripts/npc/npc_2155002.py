@@ -6,7 +6,7 @@ from net.swordie.ms.constants import ItemConstants
 
 flameID = ItemConstants.POWERFUL_REBIRTH_FLAME
 flameNXCost = 20000
-requiredNXPerRoll = 5000
+requiredNXPerRoll = 30000
 bulkSize = 500
 selection = sm.sendNext(
     "#e<Equip Auto Flame NPC>#n \r\n Hey #h #. I am in charge of Equip Flaming. Please choose one of the options below:" +
