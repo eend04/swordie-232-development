@@ -1,0 +1,23 @@
+XML IMPORT TEST
+====================
+
+Item ID: 1073631
+Required job: 4
+Required level: 250
+Required STR: 0
+Required DEX: 0
+
+STR: 55
+DEX: 55
+PDD: 325
+PAD: 12
+IED: 0
+
+Upgrade slots: 8
+Set item ID: 888
+Charm EXP: 200
+Boss reward: true
+Equip trade block: true
+Trade available: 2
+
+Runtime conversion: SUCCESS

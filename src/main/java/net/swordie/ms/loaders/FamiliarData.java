@@ -14,7 +14,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created on 4/24/2020.
@@ -243,6 +245,15 @@ public class FamiliarData {
     public static BadgeInfo getBadgeInfoById(int badgeId) {
         return badgeInfos.getOrDefault(badgeId, null);
     }
+public static Set<Integer> getAllBadgeFamiliarIds() {
+    Set<Integer> familiarIds = new HashSet<>();
+
+    for (BadgeInfo badgeInfo : badgeInfos.values()) {
+        familiarIds.addAll(badgeInfo.getFamList());
+    }
+
+    return familiarIds;
+}
 
     public static void generateDatFiles() {
         log.info("Started generating Familiar data.");

@@ -43,6 +43,7 @@ import net.swordie.ms.handlers.header.OutHeader;
 import net.swordie.ms.life.AffectedArea;
 import net.swordie.ms.life.Life;
 import net.swordie.ms.life.RandomPortal;
+import net.swordie.ms.life.Familiar;
 import net.swordie.ms.life.Reactor;
 import net.swordie.ms.life.drop.Drop;
 import net.swordie.ms.life.mob.Mob;
@@ -97,6 +98,22 @@ public class AdminCommands {
         public static void execute(Char chr, String[] args) {
         }
     }
+
+@Command(names = {"unlockallbadges"}, requiredType = Tester)
+public static class UnlockAllBadges extends AdminCommand {
+
+    public static void execute(Char chr, String[] args) {
+        var fcm = chr.getFamiliarCodexManager();
+
+        fcm.getCollectedFamiliars().addAll(
+                FamiliarData.getAllBadgeFamiliarIds()
+        );
+
+        chr.write(UserLocal.familiarBadgeAddResult(chr));
+
+        chr.chatMessage("All familiar badges unlocked!");
+    }
+}
 
     @Command(names = {"help"}, requiredType = Player)
     public static class Help extends AdminCommand {
@@ -199,6 +216,99 @@ public class AdminCommands {
             chr.getQuestManager().completeQuest(QuestConstants.FIFTH_JOB_QUEST);
         }
     }
+
+
+@Command(names = {"spawnfam"}, requiredType = Tester)
+public static class SpawnFamiliar extends AdminCommand {
+
+    public static void execute(Char chr, String[] args) {
+
+        if (args.length < 4) {
+            chr.chatMessage("Usage: !spawnfam <familiarCardItemID> <option1> <option2>");
+            chr.chatMessage("Use 0 for an empty potential line.");
+            return;
+        }
+
+        int cardItemId;
+        int option1;
+        int option2;
+
+        try {
+            cardItemId = Integer.parseInt(args[1]);
+            option1 = Integer.parseInt(args[2]);
+            option2 = Integer.parseInt(args[3]);
+        } catch (NumberFormatException e) {
+            chr.chatMessage("All arguments must be valid numbers.");
+            return;
+        }
+
+        // Validate familiar card
+        if (!ItemConstants.isFamiliar(cardItemId)) {
+            chr.chatMessage("That is not a familiar card item ID.");
+            return;
+        }
+
+        var itemInfo = ItemData.getItemInfoByID(cardItemId);
+
+        if (itemInfo == null) {
+            chr.chatMessage("Could not find item information for card " + cardItemId);
+            return;
+        }
+
+        // Retrieve familiar ID and grade, following FamiliarHandler
+        int familiarId = itemInfo.getFamiliarId();
+        int grade = itemInfo.getGrade();
+
+        // Handle Fauxmiliar cards, matching the normal familiar-add handler
+        if (ItemConstants.isFauxmiliarCard(cardItemId)) {
+            if (cardItemId == 2871251) {
+                familiarId = 9963000;
+            } else {
+                familiarId = 9963001;
+            }
+        }
+
+        if (familiarId <= 0) {
+            chr.chatMessage("This card does not have a valid familiar ID.");
+            return;
+        }
+
+        if (grade < 0 || grade > 4) {
+            chr.chatMessage("Invalid familiar grade: " + grade);
+            return;
+        }
+
+        // Validate potential IDs. Zero represents an empty line.
+        if (option1 != 0 && ItemData.getFamiliarOptionById(option1) == null) {
+            chr.chatMessage("Invalid familiar potential ID: " + option1);
+            return;
+        }
+
+        if (option2 != 0 && ItemData.getFamiliarOptionById(option2) == null) {
+            chr.chatMessage("Invalid familiar potential ID: " + option2);
+            return;
+        }
+
+        // Create the familiar
+        Familiar familiar = new Familiar(familiarId, "", chr, grade);
+
+        // Assign the selected potentials directly, bypassing random rolls
+        familiar.setOptions(new int[]{option1, option2});
+
+        // Add to the familiar codex
+        chr.addFamiliar(familiar);
+
+        // Notify client
+        chr.write(UserLocal.familiarAddResult(Collections.singletonList(familiar)));
+        chr.write(UserLocal.familiarBadgeAddResult(chr));
+
+        chr.chatMessage(
+                "Created familiar %d (Grade %d) with potentials %d and %d.",
+                familiarId, grade, option1, option2
+        );
+    }
+}
+
 
     @Command(names = {"showinvinfo", "invinfo"}, requiredType = Tester)
     public static class ShowInvInfo extends AdminCommand {

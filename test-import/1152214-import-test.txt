@@ -1,0 +1,23 @@
+XML IMPORT TEST
+====================
+
+Item ID: 1152214
+Required job: 4
+Required level: 250
+Required STR: 0
+Required DEX: 0
+
+STR: 51
+DEX: 51
+PDD: 450
+PAD: 28
+IED: 0
+
+Upgrade slots: 2
+Set item ID: 888
+Charm EXP: 200
+Boss reward: true
+Equip trade block: true
+Trade available: 2
+
+Runtime conversion: SUCCESS
