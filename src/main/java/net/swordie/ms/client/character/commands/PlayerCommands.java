@@ -40,7 +40,7 @@ public class PlayerCommands {
             Map<BaseStat, Integer> tbs = chr.getTotalBasicStats();
             StringBuilder sb = new StringBuilder();
             List<BaseStat> sortedList = Arrays.stream(BaseStat.values()).sorted(Comparator.comparing(Enum::toString)).collect(Collectors.toList());
-            if (chr.getUser().getAccountType().ordinal() >= AccountType.Tester.ordinal() && Server.DEBUG) {
+            if (false) {
                 for (BaseStat baseStat : sortedList) {
                     sb.append(String.format("%s = %d, ", baseStat, tbs.getOrDefault(baseStat, 0)));
                 }
