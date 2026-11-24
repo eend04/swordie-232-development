@@ -359,11 +359,11 @@ if (chaos) {
     // Add this line - define your minimum value
     int minRoll = 10; // Change this to your desired minimum value
     
-    for (EquipBaseStat ebs : ScrollStat.getRandStats()) {
-        int cur = (int) equip.getBaseStat(ebs);
-        if (cur == 0) {
-            continue;
-        }
+for (EquipBaseStat ebs : ScrollStat.getRandStats()) {
+    int cur = (int) equip.getBaseStat(ebs);
+    if (cur == 0 && ebs != EquipBaseStat.iPAD) {
+        continue;
+    }
         int randStat = Util.getRandom(max);
         randStat = !noNegative && Util.succeedProp(50) ? -randStat : randStat;
         

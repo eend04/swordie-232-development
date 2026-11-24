@@ -92,6 +92,53 @@ public class AdminCommands {
     private static final AccountDao accountDao = (AccountDao) SworDaoFactory.getByClass(Account.class);
     private static final UserDao userDao = (UserDao) SworDaoFactory.getByClass(User.class);
 
+private static void spawnBossWithHpMultiplier(Char chr, int mobId, int multiplier, String bossName) {
+    Mob mob = MobData.getMobDeepCopyById(mobId);
+
+    if (mob == null) {
+        chr.chatMessage("Could not find " + bossName + " (Mob ID: " + mobId + ").");
+        return;
+    }
+
+    long baseHp = mob.getMaxHp();
+    long newHp;
+
+    try {
+        newHp = Math.multiplyExact(baseHp, multiplier);
+    } catch (ArithmeticException e) {
+        chr.chatMessage("HP calculation overflow for " + bossName + ".");
+        return;
+    }
+
+    Field field = chr.getField();
+    Position pos = chr.getPosition();
+    Foothold fh = field.getInfo().getFootholdById(chr.getFoothold());
+
+    mob.setCurFoodhold(fh);
+    mob.setHomeFoothold(fh);
+    mob.setPosition(pos.deepCopy());
+    mob.setPrevPos(pos.deepCopy());
+    mob.setPosition(pos.deepCopy());
+
+    mob.setMaxHp(newHp);
+    mob.setHp(newHp);
+
+    mob.setNotRespawnable(true);
+
+    if (mob.getField() == null) {
+        mob.setField(field);
+    }
+
+    field.spawnLife(mob, null);
+
+    chr.chatMessage(
+            "Spawned %s with %dx base HP (%s).",
+            bossName,
+            multiplier,
+            String.format("%,d", newHp)
+    );
+}
+
     @Command(names = {"test"}, requiredType = Admin)
     public static class Test extends AdminCommand {
 
@@ -824,6 +871,34 @@ public static class SpawnFamiliar extends AdminCommand {
             }
         }
     }
+
+@Command(names = {"vhilla"}, requiredType = Tester)
+public static class SpawnVerusHilla extends AdminCommand {
+    public static void execute(Char chr, String[] args) {
+        spawnBossWithHpMultiplier(chr, 8880405, 2, "Verus Hilla");
+    }
+}
+
+@Command(names = {"vhilla3"}, requiredType = Tester)
+public static class SpawnVerusHilla3 extends AdminCommand {
+    public static void execute(Char chr, String[] args) {
+        spawnBossWithHpMultiplier(chr, 8880405, 3, "Verus Hilla");
+    }
+}
+
+@Command(names = {"darknell"}, requiredType = Tester)
+public static class SpawnHardDarknell extends AdminCommand {
+    public static void execute(Char chr, String[] args) {
+        spawnBossWithHpMultiplier(chr, 8645066, 2, "Hard Darknell");
+    }
+}
+
+@Command(names = {"darknell3"}, requiredType = Tester)
+public static class SpawnHardDarknell3 extends AdminCommand {
+    public static void execute(Char chr, String[] args) {
+        spawnBossWithHpMultiplier(chr, 8645066, 3, "Hard Darknell");
+    }
+}
 
     @Command(names = {"npc", "spawnnpc"}, requiredType = GameMaster)
     public static class NPC extends AdminCommand {
