@@ -768,88 +768,99 @@ public class ItemHandlerModule {
         chr.dispose();
     }
 
-    public static boolean enhanceItem(Char chr, Equip equip, boolean advanced, boolean safeguard) {
-        if (equip == null) {
-            chr.chatMessage("Could not find the given equip.");
-            return false;
-        }
-
-        if (equip.cannotBeEnhanced(chr)) {
-            chr.chatMessage("Equipment cannot be enhanced.");
-            return false;
-        }
-
-        long cost = GameConstants.getEnchantmentMesoCost(equip);
-        long nxCost = 0;
-
-        if (chr.getMoney() < cost) {
-            chr.chatMessage("Mesos required: " + NumberFormat.getNumberInstance(Locale.US).format(cost));
-            return false;
-        }
-
-        Equip oldEquip = equip.deepCopy();
-        int successProp = GameConstants.getEnchantmentSuccessRate(equip);
-        if (advanced) {
-            successProp += 100;
-            nxCost = GameConstants.getEnchantmentNxCost(equip, cost);
-        }
-
-        if (chr.getNX() < nxCost) {
-            chr.chatMessage("NX required: " + NumberFormat.getNumberInstance(Locale.US).format(nxCost));
-            return false;
-        }
-
-        int destroyProp = safeguard ? 0 : GameConstants.getEnchantmentDestroyRate(equip);
-        if (equip.getInvType() == EQUIPPED && destroyProp > 0 && chr.getEquipInventory().getEmptySlots() == 0) {
-            chr.write(WvsContext.broadcastMsg(BroadcastMsg.popUpMessage("You do not have enough space in your "
-                    + "equip inventory in case your item gets destroyed.")));
-            return false;
-        }
-
-        var rng = Util.getRandom(0, 1000);
-
-        var success = rng < successProp;
-        boolean boom = rng < successProp + destroyProp; // also includes success, but that's checked first
-        boolean canDegrade = equip.getInfo().isSuperiorEqp() ? equip.getChuc() > 0 : equip.getChuc() > 10 && equip.getChuc() % 5 != 0;
-        if (success) {
-            equip.setChuc((short) (equip.getChuc() + 1));
-            equip.setDropStreak(0);
-        } else if (boom) {
-            equip.setChuc((short) 0);
-            if (ItemConstants.isLongOrBigSword(equip.getItemId())) {
-            } else {
-                equip.makeVestige();
-            }
-            boom = true;
-
-/*
-            if (JobConstants.isZero(chr.getJob()) && ItemConstants.isLongOrBigSword(equip.getItemId())) {
-                chr.deductMoney(cost);
-                chr.write(FieldPacket.showUpgradeResult(oldEquip, equip, success, boom, canDegrade));
-                chr.dispose();
-                chr.getScriptManager().startScript(0, "ego_equip_boom", ScriptType.Npc);
-                return false;
-            }*/
-
-        } else if (canDegrade) {
-            equip.setChuc((short) (equip.getChuc() - 1));
-            equip.setDropStreak(equip.getDropStreak() + 1);
-        }
-        chr.deductMoney(cost);
-        chr.deductNX((int) nxCost);
-        equip.recalcEnchantmentStats();
-        oldEquip.recalcEnchantmentStats();
-        equip.updateToChar(chr);
-
-        if (JobConstants.isZero(chr.getJob()) && ItemConstants.isLongOrBigSword(equip.getItemId())) {
-            int otherEquipPos = Math.abs(equip.getBagIndex()) == 10 ? 11 : 10;
-            Equip otherEquip = (Equip) chr.getEquippedInventory().getItemBySlot(otherEquipPos);
-            otherEquip.copyChucFrom(equip);
-            otherEquip.updateToChar(chr);
-        }
-
-        return true;
+public static boolean enhanceItem(Char chr, Equip equip, boolean advanced, boolean safeguard) {
+    if (equip == null) {
+        chr.chatMessage("Could not find the given equip.");
+        return false;
     }
+
+    if (equip.cannotBeEnhanced(chr)) {
+        chr.chatMessage("Equipment cannot be enhanced.");
+        return false;
+    }
+
+    long cost = GameConstants.getEnchantmentMesoCost(equip);
+    long nxCost = 0;
+
+    if (chr.getMoney() < cost) {
+        chr.chatMessage("Mesos required: " + NumberFormat.getNumberInstance(Locale.US).format(cost));
+        return false;
+    }
+
+    Equip oldEquip = equip.deepCopy();
+    boolean guaranteedStarForce = GameConstants.isGuaranteedStarForce(equip);
+
+    int successProp = GameConstants.getEnchantmentSuccessRate(equip);
+    if (advanced) {
+        if (!guaranteedStarForce) {
+            successProp += 100;
+        }
+        nxCost = GameConstants.getEnchantmentNxCost(equip, cost);
+    }
+
+    if (chr.getNX() < nxCost) {
+        chr.chatMessage("NX required: " + NumberFormat.getNumberInstance(Locale.US).format(nxCost));
+        return false;
+    }
+
+    int destroyProp = guaranteedStarForce
+            ? 0
+            : safeguard ? 0 : GameConstants.getEnchantmentDestroyRate(equip);
+
+    if (equip.getInvType() == EQUIPPED && destroyProp > 0 && chr.getEquipInventory().getEmptySlots() == 0) {
+        chr.write(WvsContext.broadcastMsg(BroadcastMsg.popUpMessage("You do not have enough space in your "
+                + "equip inventory in case your item gets destroyed.")));
+        return false;
+    }
+
+    var rng = Util.getRandom(0, 1000);
+
+    var success = guaranteedStarForce || rng < successProp;
+    boolean boom = !guaranteedStarForce && rng < successProp + destroyProp;
+    boolean canDegrade = !guaranteedStarForce
+            && (equip.getInfo().isSuperiorEqp()
+            ? equip.getChuc() > 0
+            : equip.getChuc() > 10 && equip.getChuc() % 5 != 0);
+
+    if (success) {
+        equip.setChuc((short) (equip.getChuc() + 1));
+        equip.setDropStreak(0);
+    } else if (boom) {
+        equip.setChuc((short) 0);
+        if (ItemConstants.isLongOrBigSword(equip.getItemId())) {
+        } else {
+            equip.makeVestige();
+        }
+        boom = true;
+
+        /*
+        if (JobConstants.isZero(chr.getJob()) && ItemConstants.isLongOrBigSword(equip.getItemId())) {
+            chr.deductMoney(cost);
+            chr.write(FieldPacket.showUpgradeResult(oldEquip, equip, success, boom, canDegrade));
+            chr.dispose();
+            chr.getScriptManager().startScript(0, "ego_equip_boom", ScriptType.Npc);
+            return false;
+        }*/
+    } else if (canDegrade) {
+        equip.setChuc((short) (equip.getChuc() - 1));
+        equip.setDropStreak(equip.getDropStreak() + 1);
+    }
+
+    chr.deductMoney(cost);
+    chr.deductNX((int) nxCost);
+    equip.recalcEnchantmentStats();
+    oldEquip.recalcEnchantmentStats();
+    equip.updateToChar(chr);
+
+    if (JobConstants.isZero(chr.getJob()) && ItemConstants.isLongOrBigSword(equip.getItemId())) {
+        int otherEquipPos = Math.abs(equip.getBagIndex()) == 10 ? 11 : 10;
+        Equip otherEquip = (Equip) chr.getEquippedInventory().getItemBySlot(otherEquipPos);
+        otherEquip.copyChucFrom(equip);
+        otherEquip.updateToChar(chr);
+    }
+
+    return true;
+}
 
     protected static void doEnchantScrollUpgrade(Client c, InPacket inPacket, Char chr) {
         inPacket.decodeInt();// tick

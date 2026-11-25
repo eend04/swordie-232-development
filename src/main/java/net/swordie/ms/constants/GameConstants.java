@@ -1193,22 +1193,37 @@ public class GameConstants {
         gatherDrops.put(HARVEST_VEIN_START + 13, mysteriousLegendaryVeinDropMap);
     }
 
-    public static long getEnchantmentMesoCost(Equip equip) {
-        var reqLevel = equip.getReqLevel();
-        var chuc = equip.getChuc();
-        var superior = equip.getInfo().isSuperiorEqp();
+private static final int GUARANTEED_STARFORCE_START = 22;
+private static final long GUARANTEED_STARFORCE_COST_PER_STAR = 5_000_000_000L;
 
-        if (superior) {
-            return (long) Math.pow(reqLevel, 3.56);
-        }
-        if (chuc < 10) {
-            return (long) (1000 + Math.pow(reqLevel, 3) * (chuc + 1) / 25);
-        } else if (chuc < 15) {
-            return (long) (1000 + Math.pow(reqLevel, 3) * Math.pow(chuc + 1, 2.7) / 400);
-        } else {
-            return (long) (1000 + Math.pow(reqLevel, 3) * Math.pow(chuc + 1, 2.7) / 200);
-        }
+public static boolean isGuaranteedStarForce(Equip equip) {
+    return equip != null
+            && !equip.getInfo().isSuperiorEqp()
+            && equip.getChuc() >= GUARANTEED_STARFORCE_START;
+}
+
+public static long getEnchantmentMesoCost(Equip equip) {
+    var reqLevel = equip.getReqLevel();
+    var chuc = equip.getChuc();
+    var superior = equip.getInfo().isSuperiorEqp();
+
+    if (superior) {
+        return (long) Math.pow(reqLevel, 3.56);
     }
+
+    if (isGuaranteedStarForce(equip)) {
+        return GUARANTEED_STARFORCE_COST_PER_STAR
+                * (chuc - GUARANTEED_STARFORCE_START + 1);
+    }
+
+    if (chuc < 10) {
+        return (long) (1000 + Math.pow(reqLevel, 3) * (chuc + 1) / 25);
+    } else if (chuc < 15) {
+        return (long) (1000 + Math.pow(reqLevel, 3) * Math.pow(chuc + 1, 2.7) / 400);
+    } else {
+        return (long) (1000 + Math.pow(reqLevel, 3) * Math.pow(chuc + 1, 2.7) / 200);
+    }
+}
 
     public static long getEnchantmentNxCost(Equip equip, long mesoCost) {
         if (equip.getChuc() <= 15) {
@@ -1233,6 +1248,9 @@ public class GameConstants {
     }
 
     public static int getEnchantmentSuccessRate(Equip equip) {
+		if (isGuaranteedStarForce(equip)) {
+    return 1000;
+}
         if (equip.getDropStreak() >= 2) {
             return 1000;
         }
@@ -1247,7 +1265,9 @@ public class GameConstants {
     }
 
     public static int getEnchantmentDestroyRate(Equip equip) {
-        if (equip.getDropStreak() >= 2) {
+		if (isGuaranteedStarForce(equip)) {
+    return 0;
+}        if (equip.getDropStreak() >= 2) {
             return 0;
         }
         int chuc = equip.getChuc();

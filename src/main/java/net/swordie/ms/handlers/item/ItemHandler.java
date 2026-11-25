@@ -826,6 +826,7 @@ public class ItemHandler {
             return false;
         }
         Equip oldEquip = equip.deepCopy();
+		boolean guaranteedStarForce = GameConstants.isGuaranteedStarForce(equip);
         int successProp = (int) (GameConstants.getEnchantmentSuccessRate(equip) + extraSuccessRate);
         if (extraChanceFromMiniGame) {
             successProp *= 1.045;
@@ -836,9 +837,12 @@ public class ItemHandler {
                     + "equip inventory in case your item gets destroyed.")));
             return false;
         }
-        boolean success = Util.succeedProp(successProp, 1000);
+boolean success = guaranteedStarForce || Util.succeedProp(successProp, 1000);
         boolean boom = false;
-        boolean canDegrade = equip.getInfo().isSuperiorEqp() ? equip.getChuc() > 0 : equip.getChuc() > 5 && equip.getChuc() % 5 != 0;
+        boolean canDegrade = !guaranteedStarForce
+        && (equip.getInfo().isSuperiorEqp()
+        ? equip.getChuc() > 0
+        : equip.getChuc() > 5 && equip.getChuc() % 5 != 0);
         if (success) {
             equip.setChuc((short) (equip.getChuc() + 1), showResult);
             equip.setDropStreak(0);
