@@ -1727,8 +1727,21 @@ for (int i = 0; i < getChuc(); i++) {
     // Flame level used according to the level's equip.
     // Used for STR/DEX/INT/LUK/DEF additions.
     public short getFlameLevelExtended() {
-        return (short) Math.ceil((getReqLevel() + getiIncReq() + 1.0) / ItemConstants.EQUIP_FLAME_LEVEL_DIVIDER_EXTENDED);
+        return (short) Math.ceil((getUpgradeLevel() + 1.0) / ItemConstants.EQUIP_FLAME_LEVEL_DIVIDER_EXTENDED);
     }
+
+    /**
+     * Returns the level used by upgrade systems (Star Force and flames).
+     * This does not change the item's actual required/equip level.
+     */
+    public int getUpgradeLevel() {
+        int baseLevel = UPGRADE_LEVEL_OVERRIDES.getOrDefault(getItemId(), getReqLevel());
+        return baseLevel + getiIncReq();
+    }
+
+    private static final Map<Integer, Integer> UPGRADE_LEVEL_OVERRIDES = Map.of(
+            1052669, 250 // Sweetwater Suit
+    );
 
     public int getReqLevel() {
         var equipBase = ItemData.getEquipInfoById(getItemId());
@@ -1762,7 +1775,7 @@ for (int i = 0; i < getChuc(); i++) {
     // Flame level used according to the level's equip.
     // Used for secondary stat increasing.
     public short getFlameLevel() {
-        return (short) Math.ceil((getReqLevel() + getiIncReq() + 1.0) / ItemConstants.EQUIP_FLAME_LEVEL_DIVIDER);
+        return (short) Math.ceil((getUpgradeLevel() + 1.0) / ItemConstants.EQUIP_FLAME_LEVEL_DIVIDER);
     }
 
     // Gets ATT bonus by flame tier.
@@ -1861,10 +1874,10 @@ int maxTier = 7;
                     setfDEF(getfDEF() + iAddedStatExtended);
                     break;
                 case MaxHP:
-                    setfHP(getfHP() + ((getReqLevel() + getiIncReq()) / 10) * 30 * flameTier);
+                    setfHP(getfHP() + (getUpgradeLevel() / 10) * 30 * flameTier);
                     break;
                 case MaxMP:
-                    setfMP(getfMP() + ((getReqLevel() + getiIncReq()) / 10) * 30 * flameTier);
+                    setfMP(getfMP() + (getUpgradeLevel() / 10) * 30 * flameTier);
                     break;
                 case Speed:
                     setfSpeed(getfSpeed() + flameTier);
