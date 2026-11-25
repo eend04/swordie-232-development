@@ -1203,7 +1203,7 @@ public static boolean isGuaranteedStarForce(Equip equip) {
 }
 
 public static long getEnchantmentMesoCost(Equip equip) {
-    var reqLevel = equip.getReqLevel();
+    var reqLevel = equip.getUpgradeLevel();
     var chuc = equip.getChuc();
     var superior = equip.getInfo().isSuperiorEqp();
 
