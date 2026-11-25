@@ -360,7 +360,7 @@ def get_item_enchantment_info(item, advanced):
     mesoCost = GameConstants.getEnchantmentMesoCost(item)
     nxCost = GameConstants.getEnchantmentNxCost(item, mesoCost)
 
-    string += "#kMeso cost: #b{}\r\n#kNX cost: #b{}\r\n".format(sm.formatNumber(mesoCost), sm.formatNumber(nxCost))
+    string += "#kMeso cost: #b{}\r\n#kNX cost: #b{}\r\n".format(sm.formatNumber(str(mesoCost)), sm.formatNumber(str(nxCost)))
     string += "#k\r\n"
     for tuple in stats.entrySet():
         stat = tuple.getKey()

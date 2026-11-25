@@ -790,13 +790,12 @@ public static boolean enhanceItem(Char chr, Equip equip, boolean advanced, boole
     Equip oldEquip = equip.deepCopy();
     boolean guaranteedStarForce = GameConstants.isGuaranteedStarForce(equip);
 
-    int successProp = GameConstants.getEnchantmentSuccessRate(equip);
-    if (advanced) {
-        if (!guaranteedStarForce) {
-            successProp += 100;
-        }
-        nxCost = GameConstants.getEnchantmentNxCost(equip, cost);
-    }
+int successProp = GameConstants.getEnchantmentSuccessRate(equip);
+nxCost = GameConstants.getEnchantmentNxCost(equip, cost);
+
+if (advanced && !guaranteedStarForce) {
+    successProp += 100;
+}
 
     if (chr.getNX() < nxCost) {
         chr.chatMessage("NX required: " + NumberFormat.getNumberInstance(Locale.US).format(nxCost));

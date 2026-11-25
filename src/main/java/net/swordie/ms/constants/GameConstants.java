@@ -1225,12 +1225,12 @@ public static long getEnchantmentMesoCost(Equip equip) {
     }
 }
 
-    public static long getEnchantmentNxCost(Equip equip, long mesoCost) {
-        if (equip.getChuc() <= 15) {
-            return 0;
-        }
-        return (long) (mesoCost * 0.012D);
+public static long getEnchantmentNxCost(Equip equip, long mesoCost) {
+    if (isGuaranteedStarForce(equip) || equip.getChuc() <= 15) {
+        return 0;
     }
+    return (long) (mesoCost * 0.012D);
+}
 
     public static int getVestigeRecoverCost(Equip equip) {
         var level = equip.getReqLevel();

@@ -886,9 +886,14 @@ public class EtcData {
         }
     }
 
-    public static VesselInfo getVesselInfoById(int vesselId) {
-        return vesselInfo.getOrDefault(vesselId, null);
+public static VesselInfo getVesselInfoById(int vesselId) {
+    VesselInfo result = vesselInfo.get(vesselId);
+    if (result == null) {
+        log.warn("VesselInfo MISS — lookupKey={}  loadedKeys={}  mapSize={}",
+                vesselId, vesselInfo.keySet(), vesselInfo.size());
     }
+    return result;
+}
 
     public static int getVesselExpRequirement(int level, int vesselId) {
         var vi = getVesselInfoById(vesselId);
