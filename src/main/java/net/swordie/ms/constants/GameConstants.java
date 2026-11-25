@@ -725,7 +725,7 @@ public class GameConstants {
     if (equip.getInfo() == null) {
             return 0;
         }
-        int level = equip.getReqLevel() + equip.getiIncReq();
+        int level = equip.getUpgradeLevel();
         var superior = equip.getInfo().isSuperiorEqp();
 
         var exceptionStars = ItemConstants.getItemStarLimit(equip.getItemId());
@@ -1327,7 +1327,7 @@ public static int getEquipStatBoost(Equip equip, EnchantStat es, short chuc, int
         if (es == EnchantStat.MHP || es == EnchantStat.MMP) {
             stat += chuc <= 2 ? 5 : chuc <= 4 ? 10 : chuc <= 6 ? 15 : chuc <= 8 ? 20 : chuc <= 14 ? 25 : 0;
         }
-        int reqLevel = equip.getReqLevel() + equip.getiIncReq();
+        int reqLevel = equip.getUpgradeLevel();
         // all stat
         if (es == EnchantStat.STR || es == EnchantStat.DEX || es == EnchantStat.INT || es == EnchantStat.LUK) {
             if (chuc <= 4) {
@@ -1428,10 +1428,10 @@ public static int getEquipStatBoost(Equip equip, EnchantStat es, short chuc, int
 return getEquipStatBoost(equip, es, chuc, curAmount);
         } else {
             if (es == EnchantStat.STR || es == EnchantStat.DEX || es == EnchantStat.INT || es == EnchantStat.LUK) {
-                return getStatForSuperiorEnhancement(equip.getReqLevel() + equip.getiIncReq(), chuc);
+                return getStatForSuperiorEnhancement(equip.getUpgradeLevel(), chuc);
             }
             if (es == EnchantStat.PAD || es == EnchantStat.MAD) {
-                return getAttForSuperiorEnhancement(equip.getReqLevel() + equip.getiIncReq(), chuc);
+                return getAttForSuperiorEnhancement(equip.getUpgradeLevel(), chuc);
             }
         }
         return 0;
