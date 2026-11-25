@@ -84,7 +84,7 @@ public final class StarForceStatTable {
      */
     static Integer getDelta(Equip equip, EnchantStat es, short chuc, int curAmount) {
         int star = chuc + 1;
-        int reqLevel = equip.getReqLevel() + equip.getiIncReq();
+        int reqLevel = equip.getUpgradeLevel();
         int itemId = equip.getItemId();
 
         if (star < 1) {
