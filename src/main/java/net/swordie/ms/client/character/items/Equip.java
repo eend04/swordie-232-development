@@ -1343,17 +1343,33 @@ public class Equip extends Item {
         setSpecialAttribute(attr);
     }
 
-    public TreeMap<EnchantStat, Integer> getHyperUpgradeStats() {
-        Comparator<EnchantStat> comparator = Comparator.comparingInt(EnchantStat::getVal);
-        TreeMap<EnchantStat, Integer> res = new TreeMap<>(comparator);
-        for (EnchantStat es : EnchantStat.values()) {
-            int curAmount = (int) getBaseStat(es.getEquipBaseStat());
-            if (curAmount > 0 || es == EnchantStat.PAD || es == EnchantStat.MAD || es == EnchantStat.DEF) {
-                res.put(es, GameConstants.getEnchantmentValByChuc(this, es, getChuc(), curAmount));
-            }
+public TreeMap<EnchantStat, Integer> getHyperUpgradeStats() {
+    Comparator<EnchantStat> comparator = Comparator.comparingInt(EnchantStat::getVal);
+    TreeMap<EnchantStat, Integer> res = new TreeMap<>(comparator);
+
+    for (EnchantStat es : EnchantStat.values()) {
+        int baseAmount = (int) getBaseStat(es.getEquipBaseStat());
+        int curAmount = baseAmount + getEnchantStat(es);
+
+        boolean badgeStat = ItemConstants.isBadge(getItemId())
+                && (es == EnchantStat.STR
+                || es == EnchantStat.DEX
+                || es == EnchantStat.INT
+                || es == EnchantStat.LUK);
+
+        if (baseAmount > 0
+                || es == EnchantStat.PAD
+                || es == EnchantStat.MAD
+                || es == EnchantStat.DEF
+                || badgeStat) {
+
+            res.put(es, GameConstants.getEnchantmentValByChuc(
+                    this, es, getChuc(), curAmount));
         }
-        return res;
     }
+
+    return res;
+}
 
     public int[] getOptionBase() {
         return new int[]{getOptions().get(0), getOptions().get(1), getOptions().get(2)};
@@ -1480,13 +1496,16 @@ public class Equip extends Item {
             setHyperUpgrade((short) ItemState.AmazingHyperUpgradeChecked.getVal());
         }
 
-        getEnchantStats().clear();
-        for (int i = 0; i < getChuc(); i++) {
-            for (EnchantStat es : getHyperUpgradeStats().keySet()) {
-                putEnchantStat(es, getEnchantStats().getOrDefault(es, 0) +
-                        GameConstants.getEnchantmentValByChuc(this, es, (short) i, (int) getBaseStat(es.getEquipBaseStat())));
-            }
-        }
+getEnchantStats().clear();
+for (int i = 0; i < getChuc(); i++) {
+    for (EnchantStat es : getHyperUpgradeStats().keySet()) {
+        int curAmount = (int) getBaseStat(es.getEquipBaseStat())
+                + getEnchantStat(es);
+
+        putEnchantStat(es, getEnchantStats().getOrDefault(es, 0)
+                + GameConstants.getEnchantmentValByChuc(this, es, (short) i, curAmount));
+    }
+}
     }
 
     /**

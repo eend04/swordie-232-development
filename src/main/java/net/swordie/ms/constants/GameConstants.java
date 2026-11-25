@@ -1288,8 +1288,21 @@ public class GameConstants {
     }
 
     // ugliest function in swordie
-    public static int getEquipStatBoost(Equip equip, EnchantStat es, short chuc) {
-        int stat = 0;
+public static int getEquipStatBoost(Equip equip, EnchantStat es, short chuc) {
+    int curAmount = (int) equip.getBaseStat(es.getEquipBaseStat())
+            + equip.getEnchantStat(es);
+
+    return getEquipStatBoost(equip, es, chuc, curAmount);
+}
+
+public static int getEquipStatBoost(Equip equip, EnchantStat es, short chuc, int curAmount) {
+    Integer tableValue = StarForceStatTable.getDelta(equip, es, chuc, curAmount);
+
+    if (tableValue != null) {
+        return tableValue;
+    }
+
+    int stat = 0;
         // hp/mp
         if (es == EnchantStat.MHP || es == EnchantStat.MMP) {
             stat += chuc <= 2 ? 5 : chuc <= 4 ? 10 : chuc <= 6 ? 15 : chuc <= 8 ? 20 : chuc <= 14 ? 25 : 0;
@@ -1392,7 +1405,7 @@ public class GameConstants {
             return (int) (equip.getiPDD() * (ItemConstants.isOverall(equip.getItemId()) ? 0.10 : 0.05));
         }
         if (!equip.getInfo().isSuperiorEqp()) {
-            return getEquipStatBoost(equip, es, chuc);
+return getEquipStatBoost(equip, es, chuc, curAmount);
         } else {
             if (es == EnchantStat.STR || es == EnchantStat.DEX || es == EnchantStat.INT || es == EnchantStat.LUK) {
                 return getStatForSuperiorEnhancement(equip.getReqLevel() + equip.getiIncReq(), chuc);
