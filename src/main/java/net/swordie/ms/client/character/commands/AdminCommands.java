@@ -1209,6 +1209,50 @@ public static class SpawnHardDarknell3 extends AdminCommand {
         }
     }
 
+
+@Command(names = {"showflame", "showflames"}, requiredType = Tester)
+    public static class FlameStats extends AdminCommand {
+
+        public static void execute(Char chr, String[] args) {
+            if (args.length < 2) {
+                chr.chatMessage("Usage: !flamestats <equip inventory slot>");
+                return;
+            }
+
+            int slot;
+            try {
+                slot = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                chr.chatMessage("Invalid inventory slot.");
+                return;
+            }
+
+            Item item = chr.getEquipInventory().getItemBySlot(slot);
+            if (!(item instanceof Equip)) {
+                chr.chatMessage("No equipment found in slot " + slot + ".");
+                return;
+            }
+
+            Equip equip = (Equip) item;
+
+            int actualLevel = equip.getReqLevel() + equip.getiIncReq();
+            int upgradeLevel = equip.getUpgradeLevel();
+
+            chr.chatMessage(AdminChat, String.format(
+                    "Flame Stats | Item ID: %d | Level: %d | Spoofed Level: %d",
+                    equip.getItemId(), actualLevel, upgradeLevel));
+
+            chr.chatMessage(AdminChat, String.format(
+                    "STR: %d | DEX: %d | INT: %d | LUK: %d",
+                    equip.getfSTR(), equip.getfDEX(),
+                    equip.getfINT(), equip.getfLUK()));
+
+            chr.chatMessage(AdminChat, String.format(
+                    "All Stat: %d%% | ATT: %d | MATT: %d",
+                    equip.getfAllStat(), equip.getfATT(), equip.getfMATT()));
+        }
+    }
+
     @Command(names = {"setflame", "flame"}, requiredType = Tester)
     public static class setFlame extends AdminCommand {
 

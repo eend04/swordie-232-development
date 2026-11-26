@@ -1537,7 +1537,7 @@ for (int i = 0; i < getChuc(); i++) {
         // Potential
         for (int i = 0; i < getOptions().size() - 1; i++) { // last one is anvil => skipped
             int id = getOptions().get(i);
-            int level = (reqLevel + getiIncReq()) / 10;
+            int level = getUpgradeLevel() / 10;
             ItemOption io = ItemData.getItemOptionById(id);
             if (io != null && io.isAppliedFromFan()) {
                 Map<BaseStat, Double> valMap = io.getStatValuesByLevel(level);
@@ -1548,7 +1548,7 @@ for (int i = 0; i < getChuc(); i++) {
         // Soul Potential
         if (getSoulOptionId() > 0) {
             int id = getSoulOption();
-            int level = (reqLevel + getiIncReq()) / 10;
+            int level = getUpgradeLevel() / 10;
             ItemOption io = ItemData.getItemOptionById(id);
             if (io != null && io.isAppliedFromFan()) {
                 Map<BaseStat, Double> valMap = io.getStatValuesByLevel(level);
@@ -1567,7 +1567,7 @@ for (int i = 0; i < getChuc(); i++) {
         // Potential
         for (int i = 0; i < getOptions().size() - 1; i++) { // last one is anvil => skipped
             int id = getOptions().get(i);
-            int level = (reqLevel + getiIncReq()) / 10;
+            int level = getUpgradeLevel() / 10;
             ItemOption io = ItemData.getItemOptionById(id);
             if (io != null) {
                 Map<BaseStat, Double> valMap = io.getStatValuesByLevel(level);
@@ -1590,7 +1590,7 @@ for (int i = 0; i < getChuc(); i++) {
         // Soul Potential
         if (getSoulOptionId() > 0) {
             int id = getSoulOption();
-            int level = (reqLevel + getiIncReq()) / 10;
+            int level = getUpgradeLevel() / 10;
             ItemOption io = ItemData.getItemOptionById(id);
             if (io != null) {
                 Map<BaseStat, Double> valMap = io.getStatValuesByLevel(level);
@@ -1739,9 +1739,10 @@ for (int i = 0; i < getChuc(); i++) {
         return baseLevel + getiIncReq();
     }
 
-    private static final Map<Integer, Integer> UPGRADE_LEVEL_OVERRIDES = Map.of(
-            1052669, 250 // Sweetwater Suit
-    );
+private static final Map<Integer, Integer> UPGRADE_LEVEL_OVERRIDES = Map.of(
+        1052669, 250, // Sweetwater Suit
+        1062158, 250  // Homecoming Victory Bottom
+);
 
     public int getReqLevel() {
         var equipBase = ItemData.getEquipInfoById(getItemId());
@@ -2171,7 +2172,7 @@ int maxTier = 7;
         int res = 0;
         for (int i = start; i < end; i++) { // last one is anvil => skipped
             int id = getOptions().get(i);
-            int level = (getReqLevel() + getiIncReq()) / 10;
+            int level = getUpgradeLevel() / 10;
             ItemOption io = ItemData.getItemOptionById(id);
             if (io != null) {
                 Map<BaseStat, Double> valMap = io.getStatValuesByLevel(level);

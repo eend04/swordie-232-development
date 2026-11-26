@@ -1022,14 +1022,14 @@ public class ItemConstants {
                     ).collect(Collectors.toSet()));
             }
         }
-        return res.stream()
-                .filter(io -> io.getReqLevel() <= equip.getReqLevel() + equip.getiIncReq())
-                .collect(Collectors.toList());
+return res.stream()
+        .filter(io -> io.getReqLevel() <= equip.getUpgradeLevel())
+        .collect(Collectors.toList());
     }
 
     public static List<Integer> getWeightedOptionsByEquip(Equip equip, boolean bonus, int line) {
         ItemGrade grade = getLineTier(line, ItemGrade.getGradeByVal(bonus ? equip.getBonusGrade() : equip.getBaseGrade()));
-        var cacheKey = new WeightedItemOptionKey(equip.getItemId(), bonus, grade);
+        var cacheKey = new WeightedItemOptionKey(equip.getItemId(), equip.getUpgradeLevel(), bonus, grade);
         if (weightedItemOptionsCache.containsKey(cacheKey)) {
             return weightedItemOptionsCache.get(cacheKey);
         }
